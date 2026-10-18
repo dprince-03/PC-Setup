@@ -1,0 +1,4 @@
+# local run artefacts, in case someone runs an agent from inside the repo
+pc-setup-logs/
+*.log
+.env
