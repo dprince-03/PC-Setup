@@ -14,7 +14,7 @@ may not be the newest. Fine for local dev, never for anything exposed.
 
 ## Option 2 — Latest images + real passwords (AGENT.md default)
 
-Use the compose file and `.env` generator from `Linux/Ubuntu/03-databases.md` Mode A
+Use the keyring + compose secrets setup from `Linux/Ubuntu/03-databases.md` Mode A (the user types the passwords; `pkg libsecret` for `secret-tool`)
 (`postgres:latest`, `mysql:latest`, `mongo:latest`, `redis:latest`).
 If Option 1 containers already exist on the same ports → CONFLICT. Ask which to keep.
 

@@ -28,7 +28,8 @@ Package manager: **dnf5** (`dnf`) + **Flatpak/Flathub**, plus vendor repos where
 | 09 | [DevOps and cloud](09-devops-cloud.md) | devops-cloud |
 | 10 | [Sysadmin and networking](10-sysadmin-networking.md) | sysadmin-net, linux-admin |
 | 11 | [Productivity](11-productivity.md) | productivity |
-| 12 | [Verify and report](12-verify-and-report.md) | all |
+| 12 | [Security and antivirus](12-security-antivirus.md) | security (default ON) |
+| 13 | [Verify and report](13-verify-and-report.md) | all |
 
 **dnf5 syntax reminder:** add a repo with `sudo dnf config-manager addrepo --from-repofile=<url>`.
 The old dnf4 form was `--add-repo`. On Fedora ≤ 40 (dnf4), use the old form.

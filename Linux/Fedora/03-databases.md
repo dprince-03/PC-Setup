@@ -1,7 +1,7 @@
 # 03 — Databases (Fedora)
 
 **Profiles:** databases · Ask: **A. Containers** (default) / **B. Native** / **Mixed**. Bind to
-127.0.0.1. Generate passwords; never log them.
+127.0.0.1. Passwords are typed by the user into the keyring (never generated, read or logged by the agent; no `.env`).
 
 ## Detect
 
@@ -13,10 +13,12 @@ ss -ltnp | grep -E ':(5432|3306|27017|6379)\b' || echo "ports free"
 ## Mode A — Containers
 
 Fedora ships **Podman**. Docker CE comes in module 09. Either works with the compose file from
-`Linux/Ubuntu/03-databases.md` Mode A: copy it to `~/dev-services/compose.yaml`, plus `.env`.
-- Docker: `docker compose up -d`
-- Podman: `dnf_install podman-compose && podman-compose up -d`. With SELinux, named volumes
-  just work. For bind mounts, add `:Z`.
+`Linux/Ubuntu/03-databases.md` Mode A: the user stores the passwords with `secret-tool` (`dnf_install libsecret`), then use the same `compose.yaml` + `up.sh` (no `.env`).
+- Docker: `~/dev-services/up.sh` (it reads the passwords from the keyring at launch)
+- Podman: edit `up.sh` to call `podman compose` instead of `docker compose`. Environment-sourced
+  compose secrets need a recent compose provider, so if they aren't supported, use
+  `podman secret create pg_password -` (the user types the value) and mark those secrets
+  `external: true`. With SELinux, named volumes just work. For bind mounts, add `:Z`.
 
 ## Mode B — Native
 

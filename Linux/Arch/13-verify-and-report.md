@@ -1,4 +1,4 @@
-# 12 — Verify and Report (Arch)
+# 13 — Verify and Report (Arch)
 
 Open a new login shell (`exec bash -l`).
 
@@ -9,7 +9,7 @@ flatpak list --app > "$LOG/inventory-after-flatpak.txt" 2>/dev/null
 mise ls --current > "$LOG/mise-tools.txt" 2>/dev/null; uv tool list > "$LOG/uv-tools.txt" 2>/dev/null
 checkupdates > "$LOG/upgrades-remaining.txt" 2>/dev/null   # from pacman-contrib
 ```
-Run the `check` smoke-test table from `Linux/Ubuntu/12-verify-and-report.md` (swap `redis-cli` for
+Run the `check` smoke-test table from `Linux/Ubuntu/13-verify-and-report.md` (swap `redis-cli` for
 `valkey-cli` if Valkey was chosen).
 
 Write `$LOG/REPORT.md` (AGENT.md Rule 10). Arch follow-ups: reboot after kernel/NVIDIA updates, log

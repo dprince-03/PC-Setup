@@ -17,8 +17,11 @@ Databases: **PostgreSQL, MySQL, MongoDB, Redis**, plus GUI clients.
 > Redis-endorsed Windows port (Redis 7-compatible). Don't use the very old `Redis.Redis`
 > (MSOpenTech 3.x) winget package.
 
-All services must bind to **127.0.0.1 only** (AGENT.md Rule 6). Generate passwords randomly, show
-them to the user once, and save them in the user's password manager. Never write them to the log.
+All services must bind to **127.0.0.1 only** (AGENT.md Rule 6).
+
+**Secrets rule (AGENT.md Rule 6a):** the **user** chooses and types every database password. Passwords
+are stored in the Windows Credential Manager through PowerShell SecretManagement (module 14 Step 5).
+The agent never generates, reads or prints them, and there are **no `.env` files**.
 
 ---
 
@@ -38,36 +41,62 @@ If a port is already taken, report what's using it. Don't start a second server 
 Use a single compose file the user owns. `latest`-style tags follow AGENT.md Rule 4. Pin the
 **major** when a project needs it.
 
-`%USERPROFILE%\dev-services\compose.yaml`:
+**1. The user stores the passwords** (hidden prompts; run these in the user's own terminal):
+```powershell
+pwsh -c "Install-Module Microsoft.PowerShell.SecretManagement, Microsoft.PowerShell.SecretStore -Scope CurrentUser -Force"
+pwsh -c "if (-not (Get-SecretVault -EA 0)) { Register-SecretVault -Name LocalStore -ModuleName Microsoft.PowerShell.SecretStore -DefaultVault }"
+pwsh -c "Set-Secret -Name pg_password"       # prompts for the value
+pwsh -c "Set-Secret -Name mysql_password"
+pwsh -c "Set-Secret -Name mongo_password"
+```
+
+**2. `%USERPROFILE%\dev-services\compose.yaml`.** Passwords arrive as files under `/run/secrets`:
 ```yaml
 services:
   postgres:
     image: postgres:latest
     restart: unless-stopped
     ports: ["127.0.0.1:5432:5432"]
-    environment: { POSTGRES_PASSWORD: "${PG_PASSWORD}" }
+    environment: { POSTGRES_PASSWORD_FILE: /run/secrets/pg_password }
+    secrets: [pg_password]
     volumes: [pg:/var/lib/postgresql]
   mysql:
     image: mysql:latest            # 'lts' tag is also available: mysql:lts
     restart: unless-stopped
     ports: ["127.0.0.1:3306:3306"]
-    environment: { MYSQL_ROOT_PASSWORD: "${MYSQL_PASSWORD}" }
+    environment: { MYSQL_ROOT_PASSWORD_FILE: /run/secrets/mysql_password }
+    secrets: [mysql_password]
     volumes: [mysql:/var/lib/mysql]
   mongo:
     image: mongo:latest
     restart: unless-stopped
     ports: ["127.0.0.1:27017:27017"]
-    environment: { MONGO_INITDB_ROOT_USERNAME: admin, MONGO_INITDB_ROOT_PASSWORD: "${MONGO_PASSWORD}" }
+    environment: { MONGO_INITDB_ROOT_USERNAME: admin, MONGO_INITDB_ROOT_PASSWORD_FILE: /run/secrets/mongo_password }
+    secrets: [mongo_password]
     volumes: [mongo:/data/db]
   redis:
     image: redis:latest
     restart: unless-stopped
     ports: ["127.0.0.1:6379:6379"]
     volumes: [redis:/data]
+secrets:
+  pg_password:    { environment: PG_PASSWORD }
+  mysql_password: { environment: MYSQL_PASSWORD }
+  mongo_password: { environment: MONGO_PASSWORD }
 volumes: { pg: {}, mysql: {}, mongo: {}, redis: {} }
 ```
-Put the passwords in `%USERPROFILE%\dev-services\.env` (`PG_PASSWORD=...` etc.). The user stores
-them. Then `docker compose -f $HOME\dev-services\compose.yaml up -d`.
+
+**3. `%USERPROFILE%\dev-services\up.ps1`.** It reads the vault at launch, and nothing is written to
+disk or printed:
+```powershell
+$ErrorActionPreference = 'Stop'
+$env:PG_PASSWORD    = Get-Secret pg_password    -AsPlainText
+$env:MYSQL_PASSWORD = Get-Secret mysql_password -AsPlainText
+$env:MONGO_PASSWORD = Get-Secret mongo_password -AsPlainText
+try { docker compose -f "$HOME\dev-services\compose.yaml" up -d @args }
+finally { Remove-Item Env:PG_PASSWORD, Env:MYSQL_PASSWORD, Env:MONGO_PASSWORD -EA 0 }
+```
+Run it with `pwsh $HOME\dev-services\up.ps1`, and remove the services the user doesn't want.
 For the CLI clients without native servers: `Install-App 'MongoDB.Shell'`, and `psql`/`mysql`
 via `docker exec -it <container> psql -U postgres`.
 
@@ -76,7 +105,8 @@ via `docker exec -it <container> psql -U postgres`.
 ### PostgreSQL
 ```powershell
 $pg = Resolve-LatestId 'PostgreSQL.PostgreSQL'      # newest major, e.g. PostgreSQL.PostgreSQL.18
-Install-App $pg @('--override','--mode unattended --unattendedmodeui none --superpassword "<generated>" --serverport 5432 --disable-components stackbuilder')
+# Interactive install: the USER types the superuser password in the installer (never pass it on the command line)
+Install-App $pg @('--interactive')
 # Add bin to PATH if the installer didn't:
 $bin = (Get-ChildItem 'C:\Program Files\PostgreSQL' -Directory | Sort-Object { [int]$_.Name } | Select -Last 1).FullName + '\bin'
 [Environment]::SetEnvironmentVariable('Path', [Environment]::GetEnvironmentVariable('Path','User') + ";$bin", 'User')

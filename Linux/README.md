@@ -37,7 +37,8 @@ grep -qi microsoft /proc/version && echo "Running inside WSL"
 | 09 | DevOps and cloud: Docker, K8s, IaC, cloud CLIs | devops-cloud |
 | 10 | Sysadmin, networking, Linux admin | sysadmin-net, linux-admin |
 | 11 | Productivity | productivity |
-| 12 | Verify and report | all |
+| 12 | Security and antivirus: ClamAV, rootkit checks, Lynis, firewall, MAC, encryption | security |
+| 13 | Verify and report | all |
 
 ## Shared conventions across distros
 

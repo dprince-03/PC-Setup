@@ -1,6 +1,6 @@
 # 01 — Debloat, Privacy and Developer Tweaks (Windows)
 
-**Profiles:** core (but **always ask** before running this module) · **Admin:** yes ·
+**Profiles:** debloat (menu item; **always ask** before running this module) · **Admin:** yes ·
 **Reboot:** recommended at the end
 
 Tools used (official upstream only):

@@ -12,7 +12,8 @@ individual playbooks if the two ever conflict.
 
 1. **Detect the OS** (Rule 1). Pick the matching playbook folder. If no folder matches, STOP.
 2. **Run that folder's `00-preflight.md`**. Take an inventory of what is already installed (Rule 3).
-3. **Ask the user which profiles they want** (Rule 2) and show them the plan:
+3. **ALWAYS show the setup menu** (Rule 2), with every profile plus **ALL**, and let the user
+   pick. Never assume or skip it, even if the request seems obvious. Then show the plan:
    what will be installed, what will be upgraded, what will be skipped.
 4. **Get explicit confirmation** before installing anything.
 5. **Create a restore point or snapshot** (Rule 7) before system-level changes.
@@ -51,11 +52,34 @@ but it doesn't match the detected OS, refuse and explain the mismatch.
 
 ## Rule 2 — Profiles: install only what was asked for
 
-Profiles map to modules. **Core** always runs; ask about the rest.
+Profiles map to modules. **Core** always runs. For everything else, **you must show this menu
+and wait for the user's choice** (multi-select, or ALL):
+
+```
+What would you like to set up? (pick any, comma-separated, or ALL)
+
+  0. core          (always included) package manager, terminal, Git, SSH, base CLI tools
+  1. security      antivirus + scanners, firewall, encryption checks, hardening, secret hygiene   [recommended]
+  2. languages     Python, Node.js, Java, Go, C/C++, C#/.NET (+ Rust)
+  3. databases     PostgreSQL, MySQL, MongoDB, Redis + GUI clients
+  4. ides          VS Code, Visual Studio, IntelliJ IDEA, PyCharm, Postman...
+  5. fullstack     web tooling, Bun/Deno, browsers, API tools, tunnels
+  6. mobile        Android Studio + SDK, Flutter, React Native / Expo
+  7. data-ml       Jupyter, uv/conda, NVIDIA + CUDA, PyTorch/TensorFlow
+  8. desktop       WPF/WinUI/MAUI, Electron, Tauri, Qt, Flutter desktop
+  9. devops-cloud  Docker, Kubernetes, Helm, Terraform/OpenTofu, Ansible, cloud CLIs
+ 10. sysadmin-net  networking, diagnostics, remote access
+ 11. linux-admin   Windows: WSL2 + distros · Linux: admin/virtualization tooling
+ 12. productivity  launchers, notes, password manager, comms, media
+ 13. debloat       (Windows only) remove bloat, privacy settings
+ALL. Everything above
+```
+Inside a profile, items marked "ask" in a module still get their own question.
 
 | Profile | What it covers |
 |---|---|
 | `core` (always) | package manager, terminal, shell, Git, GitHub CLI, SSH keys, fonts, base CLI tools |
+| `security` (recommended) | Defender/ClamAV + rootkit and malware scanners, firewall, encryption/Secure Boot checks, OS hardening, commit signing, secret scanning (Windows module 14, Linux module 12) |
 | `languages` (default ON) | Python, JavaScript/Node.js, Java, Go, C/C++, C#/.NET (+ Rust, optional) |
 | `databases` | MongoDB, MySQL, PostgreSQL, Redis + GUI clients |
 | `ides` (default ON) | VS Code, Visual Studio (Windows), IntelliJ IDEA, PyCharm, Postman, etc. |
@@ -134,8 +158,8 @@ The agent must **NEVER**:
 - Remove a package, user data, or a config file without asking first.
 - Run `curl ... | sudo bash` (or `irm ... | iex`) from any URL not named in a playbook.
   Download named scripts to a file first, check what they do, then run them.
-- Store, echo, or commit secrets (passwords, tokens, SSH private keys). Ask the user to type
-  `sudo`/UAC passwords themselves.
+- Store, read, echo, generate or commit secrets (passwords, tokens, SSH private keys, recovery
+  keys). See **Rule 6a**. Ask the user to type `sudo`/UAC passwords themselves.
 - Use `--force`, `--overwrite`, `--nodeps`, `-Sdd`, `--skip-broken`, or disable GPG checks to
   push past an error.
 - Edit the bootloader, partitions, or disk encryption.
@@ -145,6 +169,21 @@ The agent **MUST ASK** before:
 - Debloat/privacy changes (show the list first), removing preinstalled apps, rebooting,
   changing the default shell, installing GPU drivers, enabling Hyper-V/WSL/virtualization
   features, or adding a third-party repository.
+
+## Rule 6a — Secrets (no exceptions)
+
+- **No `.env` files with real values, and no plaintext secret files.** Secrets live in a secret
+  manager: the OS keyring (Windows Credential Manager via PowerShell SecretManagement, GNOME
+  keyring/libsecret via `secret-tool`, or `pass`), a password manager CLI (`op`, `bw`), or a secret
+  manager (Bitwarden Secrets Manager `bws`, Infisical). Projects use `op run` / `bws run` /
+  `infisical run` instead of `.env` files.
+- **The user always types secret values themselves**, at a hidden prompt (`Set-Secret`,
+  `secret-tool store`, `read -rs`, `gh secret set`) or in the manager's UI. **Never generate
+  passwords for the user.**
+- **Never read secrets:** don't print, `cat`, echo, decrypt, log or inspect secret values, tokens,
+  private keys or recovery keys (BitLocker/LUKS). Never ask the user to paste a secret into the chat.
+  Checking that a secret *exists* by name is fine. Scripts may pass a secret straight from the
+  keyring to the process that needs it, without displaying it.
 
 ## Rule 7 — Snapshots / restore points
 
@@ -194,11 +233,11 @@ a non-standard disk layout), stop and ask. A short question is better than a bro
 PC-Setup/
 ├── AGENT.md            ← you are here (rules)
 ├── README.md           ← human overview
-├── windows/            ← Windows 11 playbook (00 … 14)
+├── windows/            ← Windows 11 playbook (00 … 15; 14 = security & antivirus)
 └── Linux/
     ├── README.md       ← Linux overview + distro detection
-    ├── Ubuntu/         ← Ubuntu & derivatives (00 … 12)
-    ├── Fedora/         ← Fedora Workstation/spins (00 … 12)
-    ├── Arch/           ← vanilla Arch Linux (00 … 12)
-    └── Omarchy/        ← Omarchy (DHH's opinionated Arch + Hyprland) (00 … 12)
+    ├── Ubuntu/         ← Ubuntu & derivatives (00 … 13; 12 = security & antivirus)
+    ├── Fedora/         ← Fedora Workstation/spins (00 … 13; 12 = security & antivirus)
+    ├── Arch/           ← vanilla Arch Linux (00 … 13; 12 = security & antivirus)
+    └── Omarchy/        ← Omarchy (DHH's opinionated Arch + Hyprland) (00 … 13; 12 = security & antivirus)
 ```

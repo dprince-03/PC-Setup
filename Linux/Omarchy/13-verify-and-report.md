@@ -1,4 +1,4 @@
-# 12 — Verify and Report (Omarchy)
+# 13 — Verify and Report (Omarchy)
 
 Open a new terminal (Super + Enter).
 
@@ -8,7 +8,7 @@ pacman -Qe > "$LOG/inventory-after-explicit.txt"; pacman -Qm > "$LOG/inventory-a
 mise ls --current > "$LOG/mise-tools.txt"; uv tool list > "$LOG/uv-tools.txt" 2>/dev/null
 omarchy-version > "$LOG/omarchy-version.txt" 2>/dev/null
 ```
-Run the `check` smoke-test table from `Linux/Ubuntu/12-verify-and-report.md`.
+Run the `check` smoke-test table from `Linux/Ubuntu/13-verify-and-report.md`.
 
 `$LOG/REPORT.md` (AGENT.md Rule 10). Omarchy follow-ups: log out/in for group changes (kvm, wireshark,
 libvirt, docker), sign in to the IDEs, `gh auth login`, and remind the user that **`omarchy update`**

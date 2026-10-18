@@ -1,4 +1,4 @@
-# 14 — Verify Everything and Write the Report (Windows)
+# 15 — Verify Everything and Write the Report (Windows)
 
 **Profiles:** all · Run in a **new** PowerShell 7 window so PATH changes are picked up.
 
@@ -39,6 +39,10 @@ $tests = [ordered]@{
   'az'         = { (az version | ConvertFrom-Json).'azure-cli' }
   'gcloud'     = { gcloud --version | Select -First 1 }
   'wsl'        = { (wsl --version)[0] }
+  'defender'   = { $m = Get-MpComputerStatus; "realtime=$($m.RealTimeProtectionEnabled) tamper=$($m.IsTamperProtected) sigs=$($m.AntivirusSignatureLastUpdated)" }
+  'firewall'   = { (Get-NetFirewallProfile | ForEach-Object { "$($_.Name)=$($_.Enabled)" }) -join ' ' }
+  'bitlocker'  = { (Get-BitLockerVolume -MountPoint C:).ProtectionStatus }   # status only, never the key
+  'gitleaks'   = { gitleaks version }
   'code'       = { code --version | Select -First 1 }
   'adb'        = { adb version | Select -First 1 }
   'flutter'    = { flutter --version | Select -First 1 }

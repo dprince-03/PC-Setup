@@ -2,7 +2,7 @@
 
 **Profiles:** databases · Ask: **A. Docker** (default) / **B. Native** / **Mixed**. Bind to 127.0.0.1.
 
-**Mode A:** Docker from module 09, then the compose file from `Linux/Ubuntu/03-databases.md` Mode A.
+**Mode A:** Docker from module 09, then the keyring + compose secrets setup from `Linux/Ubuntu/03-databases.md` Mode A (`pac libsecret` for `secret-tool`; the user types the passwords; no `.env`).
 
 **Mode B (native):**
 

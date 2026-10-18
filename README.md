@@ -29,10 +29,14 @@ A human can follow them too.
    > then set up my machine.
 
 The agent will:
+- **always show a setup menu first** (every profile: security, languages, databases, IDEs, fullstack,
+  mobile, data-ml, desktop, devops-cloud, sysadmin, linux-admin, productivity, debloat, or **ALL**)
 - **detect the OS first** and refuse to run the wrong playbook
 - **inventory what's already installed** and skip or upgrade it, never blindly reinstall
 - install **only the latest stable versions**, from **official sources**
 - ask before debloating, rebooting, adding repos, or installing drivers
+- **never handle your secrets**: no `.env` files and no generated passwords. You type every secret
+  into your OS keyring or secret manager yourself, and the agent never reads them
 - verify every tool and write a final report to `~/pc-setup-logs/`
 
 ## Layout
@@ -62,9 +66,10 @@ Every playbook uses the same module numbering, so you can find the same topic in
 | 09 | Data science / ML / DL | DevOps and cloud |
 | 10 | Desktop app dev | Sysadmin, networking, Linux admin |
 | 11 | DevOps and cloud | Productivity |
-| 12 | Sysadmin and networking | Verify and report |
-| 13 | Productivity | |
-| 14 | Verify and report | |
+| 12 | Sysadmin and networking | **Security and antivirus** |
+| 13 | Productivity | Verify and report |
+| 14 | **Security and antivirus** | |
+| 15 | Verify and report | |
 
 ## Stack covered
 
@@ -76,6 +81,9 @@ Compass, Workbench, Redis Insight.
 AWS/Azure/GCP CLIs.
 **IDEs/tools:** VS Code, Visual Studio 2026, IntelliJ IDEA, PyCharm, Android Studio, Postman,
 Bruno, Neovim, JetBrains Toolbox.
+**Security:** Microsoft Defender hardening (ASR rules, network protection, PUA blocking),
+ClamAV, rkhunter/chkrootkit, Lynis, arch-audit, firewall/AppArmor/SELinux checks, BitLocker/LUKS +
+Secure Boot checks, gitleaks, osv-scanner, SSH commit signing, OS-keyring secrets.
 **Productivity:** PowerToys, Everything, Flow Launcher, ShareX, Obsidian, Bitwarden, and the
 Linux equivalents.
 

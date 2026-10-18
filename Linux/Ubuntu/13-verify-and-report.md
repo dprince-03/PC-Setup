@@ -1,4 +1,4 @@
-# 12 — Verify and Report (Ubuntu)
+# 13 — Verify and Report (Ubuntu)
 
 Open a **new login shell** first (`exec bash -l`) so PATH and group changes are picked up.
 
@@ -20,6 +20,8 @@ check terraform terraform -version; check ansible ansible --version; check aws a
 check code code --version; check adb adb version; check flutter flutter --version
 check postgres psql -h 127.0.0.1 -U postgres -c 'select 1' ; check redis redis-cli -h 127.0.0.1 ping
 check nvidia nvidia-smi -L
+check clamav systemctl is-active clamav-freshclam; check firewall sudo ufw status; check gitleaks gitleaks version
+check apparmor sudo aa-status --enabled
 } | tee "$LOG/smoke-tests.md"
 ```
 Remove rows for profiles that weren't selected.

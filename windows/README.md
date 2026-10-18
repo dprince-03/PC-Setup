@@ -10,7 +10,7 @@ of mainstream support. Warn the user, then continue only if they agree.
 | # | Module | Profiles | Needs admin | May reboot |
 |---|---|---|---|---|
 | 00 | [Preflight](00-preflight.md) | all | yes | no |
-| 01 | [Debloat and privacy](01-debloat-and-privacy.md) | core (ask) | yes | yes |
+| 01 | [Debloat and privacy](01-debloat-and-privacy.md) | debloat (ask) | yes | yes |
 | 02 | [Foundation](02-foundation.md) | core | yes | no |
 | 03 | [WSL2 and Linux](03-wsl.md) | linux-admin, devops-cloud, data-ml | yes | **yes** |
 | 04 | [Languages and SDKs](04-languages.md) | languages | partly | no |
@@ -23,7 +23,8 @@ of mainstream support. Warn the user, then continue only if they agree.
 | 11 | [DevOps and cloud](11-devops-cloud.md) | devops-cloud | yes | **yes** |
 | 12 | [Sysadmin and networking](12-sysadmin-networking.md) | sysadmin-net | yes | maybe |
 | 13 | [Productivity](13-productivity.md) | productivity | yes | no |
-| 14 | [Verify and report](14-verify-and-report.md) | all | no | no |
+| 14 | [Security and antivirus](14-security-antivirus.md) | security (default ON) | yes | maybe |
+| 15 | [Verify and report](15-verify-and-report.md) | all | no | no |
 
 ## The install pattern (used everywhere)
 
